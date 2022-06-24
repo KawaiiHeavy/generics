@@ -84,7 +84,7 @@ public class CountMapTest {
 
         // При вызове toMap создается TreeMap, который сохраняет порядок добавления
         // (просто чтобы было проще сравнить все значения)
-        for (Map.Entry<? extends Number, Integer> entry : map.entrySet()){
+        for (Map.Entry<? extends Number, Integer> entry : map.entrySet()) {
             Assertions.assertEquals(countMap.getCount(entry.getKey()), entry.getValue());
         }
 
@@ -106,13 +106,13 @@ public class CountMapTest {
 
         countMap.toMap(map);
 
-        for (Map.Entry<Integer, Integer> entry : map.entrySet()){
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             Assertions.assertEquals(countMap.getCount(entry.getKey()), entry.getValue());
         }
     }
 
     @Test
-    public void addingStringsGettingCount(){
+    public void addingStringsGettingCount() {
         CountMap<String> countMap = new CountMapImpl();
 
         countMap.add("a");

@@ -17,7 +17,7 @@ public class Main {
         map.add(5);
         map.add(10);
 
-        map.remove(10);
+//        map.remove(10);
 
         System.out.println(map.getCount(5));
         System.out.println(map.getCount(6));
