@@ -50,32 +50,65 @@ public class CountMapImpl<T> implements CountMap<T> {
                     ", value=" + value +
                     '}';
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node<?> node = (Node<?>) o;
+            return Objects.equals(key, node.key);
+        }
+
+        @Override
+        public int hashCode() {
+            return key.hashCode();
+        }
     }
 
-    private Collection<Node<T>> collection;
+    private Set<Node<T>> set;
 
     public CountMapImpl(){
-        this.collection = new ArrayList<>();
+        this.set = new HashSet<>();
     }
 
     @Override
     public void add(T t) {
-        boolean exists = false;
-        for (Node<T> node: collection){
-            if (node.getKey().equals(t)){
-                exists = true;
-                node.updateValue();
-                break;
+
+        Node<T> inputNode = new Node<>(t, 1);
+
+        if (set.contains(inputNode)){
+            for (Node<T> node: set){
+                if (node.equals(inputNode)){
+                    node.updateValue();
+                    break;
+                }
             }
         }
-        if (!exists) {
-            collection.add(new Node<T>(t));
+        else {
+            set.add(new Node<T>(t));
+        }
+    }
+
+    public void add(T t, Integer value){
+
+        Node<T> inputNode = new Node<>(t, value);
+
+        if (set.contains(inputNode)){
+            for (Node<T> node: set){
+                if (node.equals(inputNode)){
+                    node.updateValue(value);
+                    break;
+                }
+            }
+        }
+        else {
+            set.add(new Node<T>(t, value));
         }
     }
 
     @Override
     public int getCount(T t) {
-        for (Node<T> node: collection){
+        for (Node<T> node: set){
             if (node.getKey().equals(t)){
                 return node.getValue();
             }
@@ -85,14 +118,17 @@ public class CountMapImpl<T> implements CountMap<T> {
 
     @Override
     public int size() {
-        return collection.size();
+        return set.size();
     }
 
     @Override
     public int remove(T t) {
-        for (Node<T> node: collection){
+        Iterator<Node<T>> it = set.iterator();
+
+        while(it.hasNext()){
+            Node<T> node = it.next();
             if (node.getKey().equals(t)){
-                collection.remove(node);
+                it.remove();
                 return node.getValue();
             }
         }
@@ -102,26 +138,16 @@ public class CountMapImpl<T> implements CountMap<T> {
     @Override
     public void addAll(CountMap<? extends T> source) {
         Map<T, Integer> map = (Map<T, Integer>) source.toMap();
-        boolean isExist;
 
         for (Map.Entry<T, Integer> entry : map.entrySet()){
-            isExist = false;
-            for (Node<T> node : collection){
-                if (node.getKey().equals(entry.getKey())){
-                    isExist = true;
-                    node.updateValue(entry.getValue());
-                }
-            }
-            if (!isExist){
-                collection.add(new Node<T>(entry.getKey(), entry.getValue()));
-            }
+            add(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
     public Map<T, Integer> toMap() {
         Map<T, Integer> map = new TreeMap<>();
-        for (Node<T> node: collection){
+        for (Node<T> node: set){
             map.put(node.getKey(), node.getValue());
         }
         return map;
@@ -129,7 +155,7 @@ public class CountMapImpl<T> implements CountMap<T> {
 
     @Override
     public void toMap(Map<? super T, Integer> destination) {
-        for (Node<T> node : collection){
+        for (Node<T> node : set){
             destination.put(node.getKey(), node.getValue());
         }
     }
